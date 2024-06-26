@@ -1,55 +1,76 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 int main()
 {
-#define MAX_TRY 5
-#define MAX_COLORS 5
-#define CODE_SIZE 4
+    printf("TP7: Les Tableaux\n");
 
-const char COLORS[] = {'B', 'R', 'Y', 'G', 'O'};
+    //constantes
+    const int MAX_TENTATIVES = 3;
+    const int NOMBRE_COULEUR = 5;
+    const char COULEURS[] = {'R', 'V', 'B', 'J', 'O'};
+    const int TAILLE_CODE = 4;
 
-    char code_secret[] = {'B', 'R', 'Y', 'G'};
-    char user_propose[CODE_SIZE];
+    char code_secret[TAILLE_CODE];
+    char saisie_utilisateur[TAILLE_CODE];
 
-    for(int nb_try = 1; nb_try<= MAX_TRY; nb_try++)
+    //generation du code secret
+    srand(time(NULL));
+    for(int i=0; i< TAILLE_CODE; i++)
+    {
+        int couleur_id = rand() % NOMBRE_COULEUR;
+        code_secret[i] = COULEURS[couleur_id];
+        printf("code_secret[%d] = %c\n", i, code_secret[i]);
+    }
+
+    for(int nb_tentatives=1; nb_tentatives <= MAX_TENTATIVES; nb_tentatives++)
     {
         //lecture saisie utilisateur
-    printf("Propose une combinaison de 4 couleurs avec {'B', 'R', 'Y', 'G', 'O'}\n");
-    fflush(stdin);
-    scanf("%c%c%c%c", user_propose, (user_propose+1),(user_propose+2),(user_propose+3));
+        printf("Donnez un code de 4 couleurs parmis {'R', 'V', 'B', 'J', 'O'}\n");
+        fflush(stdin);
+        scanf("%c%c%c%c", saisie_utilisateur, (saisie_utilisateur+1), (saisie_utilisateur+2), (saisie_utilisateur+3));
 
         //init des compteurs
-        int nb_colors_good_position = 0;
-        int nb_colors_bad_position=0;
+        int nb_couleur_place = 0;
+        int nb_couleur_presente = 0;
 
-        // comparaison du code secret et de l'utilisateur
-        for(int i=0; i<CODE_SIZE; i++)
+        // comparaison du code secret et de la saisie utilisateur
+        for(int i=0; i<TAILLE_CODE; i++) //boucle code secret
         {
-            if(code_secret[i] ==  user_propose[i])
+            short couleur_prensente = 0;
+            for(int j=0; j<TAILLE_CODE; j++) //boucle saisie utilisateur
             {
-                nb_colors_good_position++;
+                if(code_secret[i] == saisie_utilisateur[j]) // couleur presente
+                {
+                    couleur_prensente = 1;
+                    if(i == j)
+                    {
+                        nb_couleur_place++;
+                        break;
+                    }
+                }
             }
+            nb_couleur_presente += couleur_prensente;
         }
-
 
         //gestion fin de partie
-        if(nb_colors_good_position == CODE_SIZE)
+        if(nb_couleur_place == TAILLE_CODE)
         {
-            printf("Bravo you won!\n");
+            printf("Bravos! vous avez trouvez le code secret en %d tentatives\n", nb_tentatives);
             break;
         }
-        else if(nb_colors_good_position>= MAX_TRY)
+        else if(nb_tentatives >= MAX_TENTATIVES)
         {
-            printf("Sadly, you reach the max try!\n");
-            printf("The code was %c%c%c%c", code_secret[0], code_secret[1], code_secret[2], code_secret[3]);
+            printf("Dommage! vous avez depasse le nombre maximum de tentatives\n");
+            printf("le bon code est %c%c%c%c\n", code_secret[0], code_secret[1], code_secret[2], code_secret[3]);
         }
         else
         {
-            printf("\t TRY No%d/%d\n", nb_try, MAX_TRY);
-            printf("Couleurs bien placees : %d\n\n", nb_colors_good_position);
+            printf("\t Tentative %d/%d\n", nb_tentatives, MAX_TENTATIVES);
+            printf("Couleurs bien placees: %d\n\n", nb_couleur_place);
+            printf("Couleurs mal placees: %d\n\n", nb_couleur_presente - nb_couleur_place);
         }
-
 
     }
     return 0;
